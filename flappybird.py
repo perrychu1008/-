@@ -470,6 +470,7 @@ def main():
         pygame.display.flip()
         frame_clock += 1
     print('Game over! Score: %i' % score)
+<<<<<<< HEAD
     rea = open('score.txt')
     higscore = rea.readline()
     highscore = rea.readline()
@@ -481,6 +482,8 @@ def main():
         wri.write("%d\nHighscore: %d" %(score, highscore))
     rea.close()
     wri.close()
+=======
+>>>>>>> parent of 5b76e8b... update
     pygame.quit()
 
 
