@@ -12,7 +12,7 @@ from pygame.locals import *
 
 
 FPS = 60
-ANIMATION_SPEED = 0.18  # pixels per millisecond
+ANIMATION_SPEED = 100  # pixels per millisecond
 WIN_WIDTH = 284 * 2     # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
@@ -44,7 +44,8 @@ class Bird(pygame.sprite.Sprite):
     """
 
     WIDTH = HEIGHT = 32
-    CLIMB_SPEED = 0.1
+    SINK_SPEED = 0
+    CLIMB_SPEED = 0.3
     CLIMB_DURATION = 333.3
 
     def __init__(self, x, y, msec_to_climb, images):
@@ -96,7 +97,8 @@ class Bird(pygame.sprite.Sprite):
             self.y += (Bird.CLIMB_SPEED * frames_to_msec(delta_frames) *
                        (1 - math.cos(frac_climb_done * math.pi)))
             self.msec_to_sink -= frames_to_msec(delta_frames)
-
+        else:
+            self.y += Bird.SINK_SPEED * frames_to_msec(delta_frames)
 
     @property
     def image(self):
@@ -468,6 +470,7 @@ def main():
         pygame.display.flip()
         frame_clock += 1
     print('Game over! Score: %i' % score)
+<<<<<<< HEAD
     rea = open('score.txt')
     higscore = rea.readline()
     highscore = rea.readline()
@@ -479,6 +482,8 @@ def main():
         wri.write("%d\nHighscore: %d" %(score, highscore))
     rea.close()
     wri.close()
+=======
+>>>>>>> parent of 5b76e8b... update
     pygame.quit()
 
 
