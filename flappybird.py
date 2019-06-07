@@ -45,8 +45,8 @@ class Bird(pygame.sprite.Sprite):
 
     WIDTH = HEIGHT = 32
     SINK_SPEED = 0
-    CLIMB_SPEED = 0.3
-    CLIMB_DURATION = 333.3
+    CLIMB_SPEED = 0.8
+    CLIMB_DURATION = 100
 
     def __init__(self, x, y, msec_to_climb, images):
         """Initialise a new Bird instance.
@@ -66,7 +66,7 @@ class Bird(pygame.sprite.Sprite):
         super(Bird, self).__init__()
         self.x, self.y = x, y
         self.msec_to_climb = msec_to_climb
-        self.msec_to_sink = msec_to_climb 
+        self.msec_to_sink = 0
         self._img_wingup, self._img_wingdown = images
         self._mask_wingup = pygame.mask.from_surface(self._img_wingup)
         self._mask_wingdown = pygame.mask.from_surface(self._img_wingdown)
@@ -87,18 +87,16 @@ class Bird(pygame.sprite.Sprite):
             last called.
         """
         if self.msec_to_climb > 0:
-            frac_climb_done = 1 - self.msec_to_climb/Bird.CLIMB_DURATION
-            self.y -= (Bird.CLIMB_SPEED * frames_to_msec(delta_frames) *
-                       (1 - math.cos(frac_climb_done * math.pi)))
+            frac_climb_done = 1
+            self.y -= Bird.CLIMB_SPEED * frames_to_msec(delta_frames)
             self.msec_to_climb -= frames_to_msec(delta_frames)
 			
         if self.msec_to_sink > 0:
-            frac_climb_done = 1 - self.msec_to_sink/Bird.CLIMB_DURATION
-            self.y += (Bird.CLIMB_SPEED * frames_to_msec(delta_frames) *
-                       (1 - math.cos(frac_climb_done * math.pi)))
+            frac_climb_done = 1
+            self.y += Bird.CLIMB_SPEED * frames_to_msec(delta_frames) 
             self.msec_to_sink -= frames_to_msec(delta_frames)
-        else:
-            self.y += Bird.SINK_SPEED * frames_to_msec(delta_frames)
+        #else:
+        #   self.y += Bird.SINK_SPEED * frames_to_msec(delta_frames)
 
     @property
     def image(self):
@@ -328,13 +326,14 @@ def main():
 
     # the bird stays in the same x position, so bird.x is a constant
     # center bird on screen
-    bird = Bird(50, int(WIN_HEIGHT/2 - Bird.HEIGHT/2), 2,
+    bird = Bird(50, int(WIN_HEIGHT* 3/4), 2,
                 (images['bird-wingup'], images['bird-wingdown']))
 
     pipes = deque()
 
     frame_clock = 0  # this counter is only incremented if the game isn't paused
     score = 0
+    position = 1
     done = paused = False
     while not done:
         clock.tick(FPS)
@@ -351,12 +350,14 @@ def main():
                 break
             elif e.type == KEYUP and e.key in (K_PAUSE, K_p):
                 paused = not paused
-            elif e.type == MOUSEBUTTONUP or (e.type == KEYUP and
-                    e.key in (K_UP, K_RETURN, K_SPACE)):
-                bird.msec_to_climb = Bird.CLIMB_DURATION
-            elif e.type == MOUSEBUTTONUP or (e.type == KEYUP and 
-                    e.key in (K_DOWN, K_RETURN, K_SPACE)):
-                bird.msec_to_sink = Bird.CLIMB_DURATION
+            elif e.type == KEYDOWN and e.key == K_UP:
+                if position != 2:	
+                    bird.msec_to_climb = Bird.CLIMB_DURATION
+                    position +=1
+            elif e.type == KEYDOWN and e.key == K_DOWN:
+                if position != 0:
+                    bird.msec_to_sink = Bird.CLIMB_DURATION
+                    position -=1
         if paused:
             continue  # don't draw anything
 
