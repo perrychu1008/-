@@ -284,8 +284,8 @@ def load_images():
             'pipe-body': load_image('pipe_body.png'),
             # images for animating the flapping bird -- animated GIFs are
             # not supported in pygame
-            'bird-wingup': load_image('bird_wing_up.png'),
-            'bird-wingdown': load_image('bird_wing_down.png')}
+            'bird_origin': load_image('bird_origin.png'),
+            'bird-run': load_image('bird-run.png')}
 
 
 def frames_to_msec(frames, fps=FPS):
@@ -327,7 +327,7 @@ def main():
     # the bird stays in the same x position, so bird.x is a constant
     # center bird on screen
     bird = Bird(50, int(WIN_HEIGHT* 3/4), 2,
-                (images['bird-wingup'], images['bird-wingdown']))
+                (images['bird_origin'], images['bird-run']))
 
     pipes = deque()
 
