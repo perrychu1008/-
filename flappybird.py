@@ -13,7 +13,7 @@ from pygame.locals import *
 
 FPS = 60
 ANIMATION_SPEED = 100  # pixels per millisecond
-WIN_WIDTH = 284 * 2     # BG image size: 284x512 px; tiled twice
+WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
 
@@ -281,7 +281,7 @@ def load_images():
         img.convert()
         return img
 
-    return {'background': load_image('background.png'),
+    return {'background': load_image('ntu_background.png'),
             'pipe-end': load_image('pipe_end.png'),
             'pipe-body': load_image('pipe_body.png'),
             # images for animating the flapping bird -- animated GIFs are
@@ -404,7 +404,7 @@ def main():
 
     # the bird stays in the same x position, so bird.x is a constant
     # center bird on screen
-    bird = Bird(50, int(WIN_HEIGHT* 3/4), 2,
+    bird = Bird(30, int(WIN_HEIGHT* 3/4)-30, 2,
                 (images['bird_origin'], images['bird-run']))
 
     pipes = deque()
@@ -445,7 +445,7 @@ def main():
         if pipe_collision or 0 >= bird.y or bird.y >= WIN_HEIGHT - Bird.HEIGHT:
             done = True
 
-        for x in (0, WIN_WIDTH / 2):
+        for x in (0, WIN_WIDTH):
             display_surface.blit(images['background'], (x, 0))
 
         while pipes and not pipes[0].visible:
