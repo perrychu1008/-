@@ -4,15 +4,15 @@
 
 import math
 import os
-from random import randint
+from random import randint, randrange, sample
 from collections import deque
-
+import numpy as np
 import pygame
 from pygame.locals import *
 
 
 FPS = 60
-ANIMATION_SPEED = 100  # pixels per millisecond
+ANIMATION_SPEED = 0.5  # pixels per millisecond
 WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
@@ -160,9 +160,9 @@ class PipePair(pygame.sprite.Sprite):
         pipes.
     """
 
-    WIDTH = 80
+    WIDTH = 100
     PIECE_HEIGHT = 32
-    ADD_INTERVAL = 2000
+    ADD_INTERVAL = 1000
 
     def __init__(self, pipe_end_img, pipe_body_img):
         """
@@ -190,11 +190,12 @@ class PipePair(pygame.sprite.Sprite):
 
         #  Add obstacle
         atr_lst = []
+        a = sample(range(0, 3),2)
+        y = [i * 87 + 40 for i in a]
         for i in range(self.mul_pipe):
-            y = randint(0,2) * 87 + 40
-            piece_pos = (0, WIN_HEIGHT - PipePair.PIECE_HEIGHT - y)
-            is_bonus = True if randrange(2) % 2 == 0 else False
+            is_bonus = True if randrange(2) % 3 == 0 else False
             if i == 0:
+                piece_pos = (0, WIN_HEIGHT - PipePair.PIECE_HEIGHT - y[i])
                 if is_bonus:
                     self.image.blit(pipe_body_img, piece_pos)
                     atr_lst = [["bonus",piece_pos[1]]]
@@ -202,6 +203,7 @@ class PipePair(pygame.sprite.Sprite):
                     self.image.blit(pipe_end_img, piece_pos)
                     atr_lst = [["obstacle",piece_pos[1]]]
             if i == 1:
+                piece_pos = (0, WIN_HEIGHT - PipePair.PIECE_HEIGHT - y[i])
                 if is_bonus:
                     self.image.blit(pipe_body_img, piece_pos)
                     atr_lst.append(["bonus",piece_pos[1]])
@@ -328,7 +330,7 @@ def welcomeScr(disp):
     highscore = f.readline()
     highscore = int(highscore[11:])
 
-    imgObj = pygame.image.load('images/bird_origin.png')
+    imgObj = pygame.image.load('images/bird_origin2.png')
     fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
     font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
     font3Obj = pygame.font.Font('freesansbold.ttf', 32)
@@ -338,11 +340,11 @@ def welcomeScr(disp):
     Flappy = []
     Flappy_rec = []
     ALPHA_Y = WIN_HEIGHT / 2
-    ALPHA_X_INI = WIN_WIDTH / 2 - (len('Flappy Bird') / 2)* MAGIC_NUMBER
+    ALPHA_X_INI = WIN_WIDTH / 2 - (len('NTU Dumbird') / 2)* MAGIC_NUMBER
     birdx, birdy = WIN_WIDTH / 3, WIN_HEIGHT / 8
     CHECK = 0
     BLINKER = 0
-    for c, i in zip('Flappy Bird', range(len('Flappy Bird'))):
+    for c, i in zip('NTU Dumbird', range(len('NTU Dumbird'))):
         charObj = fontObj.render(c, True, colorify(i))
         Flappy.append(charObj)
         Flappy_rec.append(Flappy[i].get_rect())
@@ -355,7 +357,7 @@ def welcomeScr(disp):
                 sys.exit()
             elif event.type == KEYUP and event.key == K_RETURN:
                 return True
-        for i in range(len('Flappy Bird')):
+        for i in range(len('NTU Dumbird')):
             disp.blit(Flappy[i], Flappy_rec[i].center)
         if mode == 0:
             disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
@@ -452,7 +454,8 @@ def main():
         #pipe_collision = any(p.collides_with(bird) for p in pipes)
         for p in pipes:
             if p.collides_with(bird) or 0 >= bird.y or bird.y >= WIN_HEIGHT - Bird.HEIGHT:
-                #print(p.atr)
+                print(p.atr)
+                print(bird.y)
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
                 if col_atr == "bonus":
                     score += 1
