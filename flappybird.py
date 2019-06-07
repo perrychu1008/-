@@ -162,10 +162,11 @@ class PipePair(pygame.sprite.Sprite):
 
     WIDTH = 80
     PIECE_HEIGHT = 32
-    ADD_INTERVAL = 3000
+    ADD_INTERVAL = 2000
 
     def __init__(self, pipe_end_img, pipe_body_img):
-        """Initialises a new random PipePair.
+        """
+        Initialises a new random PipePair.
 
         The new PipePair will automatically be assigned an x attribute of
         float(WIN_WIDTH - 1).
@@ -176,36 +177,42 @@ class PipePair(pygame.sprite.Sprite):
             of a pipe's body.
         """
         self.x = float(WIN_WIDTH - 1)
+        # self.y = randint(0,2) * 87 + 40
         self.score_counted = False
+        self.mul_pipe = randint(1,2)
 
         self.image = pygame.Surface((PipePair.WIDTH, WIN_HEIGHT), SRCALPHA)
         self.image.convert()   # speeds up blitting
         self.image.fill((0, 0, 0, 0))
-        total_pipe_body_pieces = int(
-            (WIN_HEIGHT -                  # fill window from top to bottom
-             3 * Bird.HEIGHT -             # make room for bird to fit through
-             3 * PipePair.PIECE_HEIGHT) /  # 2 end pieces + 1 body piece
-            PipePair.PIECE_HEIGHT          # to get number of pipe pieces
-        )
-        self.bottom_pieces = randint(1, total_pipe_body_pieces)
-        self.top_pieces = total_pipe_body_pieces - self.bottom_pieces
+       
+        self.bottom_pieces = 1
+        #self.top_pieces = total_pipe_body_pieces - self.bottom_pieces
 
-        # bottom pipe
-        for i in range(1, self.bottom_pieces + 1):
-            piece_pos = (0, WIN_HEIGHT - i*PipePair.PIECE_HEIGHT)
-            self.image.blit(pipe_body_img, piece_pos)
-        bottom_pipe_end_y = WIN_HEIGHT - self.bottom_height_px
-        bottom_end_piece_pos = (0, bottom_pipe_end_y - PipePair.PIECE_HEIGHT)
-        self.image.blit(pipe_end_img, bottom_end_piece_pos)
-
-        # top pipe
-        for i in range(self.top_pieces):
-            self.image.blit(pipe_body_img, (0, i * PipePair.PIECE_HEIGHT))
-        top_pipe_end_y = self.top_height_px
-        self.image.blit(pipe_end_img, (0, top_pipe_end_y))
+        #  Add obstacle
+        atr_lst = []
+        for i in range(self.mul_pipe):
+            y = randint(0,2) * 87 + 40
+            piece_pos = (0, WIN_HEIGHT - PipePair.PIECE_HEIGHT - y)
+            is_bonus = True if randrange(2) % 2 == 0 else False
+            if i == 0:
+                if is_bonus:
+                    self.image.blit(pipe_body_img, piece_pos)
+                    atr_lst = [["bonus",piece_pos[1]]]
+                else:
+                    self.image.blit(pipe_end_img, piece_pos)
+                    atr_lst = [["obstacle",piece_pos[1]]]
+            if i == 1:
+                if is_bonus:
+                    self.image.blit(pipe_body_img, piece_pos)
+                    atr_lst.append(["bonus",piece_pos[1]])
+                else:
+                    self.image.blit(pipe_end_img, piece_pos)
+                    atr_lst.append(["obstacle",piece_pos[1]])
+        self.atr = atr_lst
+        
 
         # compensate for added end pieces
-        self.top_pieces += 1
+        # self.top_pieces += 1
         self.bottom_pieces += 1
 
         # for collision detection
@@ -277,6 +284,7 @@ def load_images():
             '.png') of the required image, without a file path.
         """
         file_name = os.path.join('.', 'images', img_file_name)
+        #file_name = "/Users/ryanhuang/Desktop/107-2/FIN programming/PBC-final-project/images/" + img_file_name
         img = pygame.image.load(file_name)
         img.convert()
         return img
@@ -441,9 +449,17 @@ def main():
             continue  # don't draw anything
 
         # check for collisions
-        pipe_collision = any(p.collides_with(bird) for p in pipes)
-        if pipe_collision or 0 >= bird.y or bird.y >= WIN_HEIGHT - Bird.HEIGHT:
-            done = True
+        #pipe_collision = any(p.collides_with(bird) for p in pipes)
+        for p in pipes:
+            if p.collides_with(bird) or 0 >= bird.y or bird.y >= WIN_HEIGHT - Bird.HEIGHT:
+                #print(p.atr)
+                col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
+                if col_atr == "bonus":
+                    score += 1
+                    p.score_counted = True
+                else:
+                    done = True
+
 
         for x in (0, WIN_WIDTH):
             display_surface.blit(images['background'], (x, 0))
