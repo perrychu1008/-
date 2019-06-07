@@ -284,8 +284,8 @@ def load_images():
             'pipe-body': load_image('pipe_body.png'),
             # images for animating the flapping bird -- animated GIFs are
             # not supported in pygame
-            'bird_origin': load_image('bird_origin.png'),
-            'bird-run': load_image('bird-run.png')}
+            'bird_origin': load_image('bird_origin1.png'),
+            'bird-run': load_image('bird-run1.png')}
 
 
 def frames_to_msec(frames, fps=FPS):
