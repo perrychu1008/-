@@ -1,2 +1,2 @@
-1
-Highscore: 1
+2
+Highscore: 2

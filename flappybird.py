@@ -87,12 +87,12 @@ class Bird(pygame.sprite.Sprite):
             last called.
         """
         if self.msec_to_climb > 0:
-            frac_climb_done = 1
+#            frac_climb_done = 1
             self.y -= Bird.CLIMB_SPEED * frames_to_msec(delta_frames)
             self.msec_to_climb -= frames_to_msec(delta_frames)
 			
         if self.msec_to_sink > 0:
-            frac_climb_done = 1
+#            frac_climb_done = 1
             self.y += Bird.CLIMB_SPEED * frames_to_msec(delta_frames) 
             self.msec_to_sink -= frames_to_msec(delta_frames)
         #else:
@@ -111,6 +111,8 @@ class Bird(pygame.sprite.Sprite):
             return self._img_wingup
         else:
             return self._img_wingdown
+
+
 
     @property
     def mask(self):
@@ -287,7 +289,6 @@ def load_images():
             'bird_origin': load_image('bird_origin1.png'),
             'bird-run': load_image('bird-run1.png')}
 
-
 def frames_to_msec(frames, fps=FPS):
     """Convert frames to milliseconds at the specified framerate.
 
@@ -307,6 +308,77 @@ def msec_to_frames(milliseconds, fps=FPS):
     """
     return fps * milliseconds / 1000.0
 
+def welcomeScr(disp):
+    WHITE = pygame.Color(255, 255, 255)
+    SLOWMOTION = 7
+    tictoc = pygame.time.Clock()
+    NAVYBLUE = pygame.Color(113, 197, 207)
+    SIZE_ALPHA = 64
+    MAGIC_NUMBER = 40
+    f = open('score.txt')
+    last_score = int(f.readline())
+    highscore = f.readline()
+    highscore = int(highscore[11:])
+
+    imgObj = pygame.image.load('images/bird_origin.png')
+    fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
+    font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
+    font3Obj = pygame.font.Font('freesansbold.ttf', 32)
+    enter = font2Obj.render('Press Enter to play!!!', True, WHITE)
+    score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, WHITE)
+    mode = 0
+    Flappy = []
+    Flappy_rec = []
+    ALPHA_Y = WIN_HEIGHT / 2
+    ALPHA_X_INI = WIN_WIDTH / 2 - (len('Flappy Bird') / 2)* MAGIC_NUMBER
+    birdx, birdy = WIN_WIDTH / 3, WIN_HEIGHT / 8
+    CHECK = 0
+    BLINKER = 0
+    for c, i in zip('Flappy Bird', range(len('Flappy Bird'))):
+        charObj = fontObj.render(c, True, colorify(i))
+        Flappy.append(charObj)
+        Flappy_rec.append(Flappy[i].get_rect())
+        Flappy_rec[i].center = (ALPHA_X_INI + i * MAGIC_NUMBER , ALPHA_Y - 100)
+    while True:
+        disp.fill(NAVYBLUE)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYUP and event.key == K_RETURN:
+                return True
+        for i in range(len('Flappy Bird')):
+            disp.blit(Flappy[i], Flappy_rec[i].center)
+        if mode == 0:
+            disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
+            CHECK += 3
+            if CHECK >= 20:
+                mode = 1
+        elif mode == 1:
+            disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
+            CHECK -= 3
+            if CHECK <= -20:
+                mode = 0
+
+
+        if BLINKER == 0:
+            BLINKER = 1
+        else:
+            disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 30 ))
+            BLINKER = 0
+        disp.blit(score, (50, 400))
+        tictoc.tick(SLOWMOTION)
+        pygame.display.update()
+
+def colorify(i):
+    RED = pygame.Color(255, 0, 0)
+    GREEN = pygame.Color(0, 255, 0)
+    PURPLE = pygame.Color(158, 9, 182)
+    YELLOW = pygame.Color(255, 255, 0)
+    ORANGE = pygame.Color(255, 128, 0)
+    PINK = pygame.Color(255, 0, 255)
+    lis = [RED, GREEN, PURPLE, YELLOW, ORANGE, PINK, RED, GREEN, PURPLE, YELLOW, ORANGE, PINK]
+    return lis[i]
 
 def main():
     """The application's entry point.
@@ -316,6 +388,12 @@ def main():
     """
 
     pygame.init()
+    try:
+        open('score.txt')
+    except IOError:
+        dummy = open('score.txt', 'w')
+        dummy.write('0\nHighscore: 0')
+        dummy.close()
 
     display_surface = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     pygame.display.set_caption('Pygame Flappy Bird')
@@ -335,6 +413,7 @@ def main():
     score = 0
     position = 1
     done = paused = False
+    welcomeScr(display_surface)
     while not done:
         clock.tick(FPS)
 
@@ -392,6 +471,17 @@ def main():
         pygame.display.flip()
         frame_clock += 1
     print('Game over! Score: %i' % score)
+    rea = open('score.txt')
+    higscore = rea.readline()
+    highscore = rea.readline()
+    highscore = int(highscore[11:])
+    wri = open('score.txt', 'w')
+    if highscore < score:
+        wri.write("%d\nHighscore: %d" %(score, score))
+    else:
+        wri.write("%d\nHighscore: %d" %(score, highscore))
+    rea.close()
+    wri.close()
     pygame.quit()
 
 
