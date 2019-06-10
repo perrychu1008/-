@@ -392,7 +392,7 @@ def gameoverScr(disp):
     highscore = f.readline()
     highscore = int(highscore[11:])
 
-    imgObj = pygame.image.load('images/bird_origin2.png')
+    imgObj = pygame.image.load('images/wind_down1.png')
     fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
     font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
     font3Obj = pygame.font.Font('freesansbold.ttf', 32)
@@ -402,11 +402,11 @@ def gameoverScr(disp):
     Flappy = []
     Flappy_rec = []
     ALPHA_Y = WIN_HEIGHT / 2
-    ALPHA_X_INI = WIN_WIDTH / 2 - (len('NTU Dumbird') / 2)* MAGIC_NUMBER
+    ALPHA_X_INI = WIN_WIDTH / 2 - (len('GAME OVER') / 2)* MAGIC_NUMBER
     birdx, birdy = WIN_WIDTH / 3, WIN_HEIGHT / 8
     CHECK = 0
     BLINKER = 0
-    for c, i in zip('NTU Dumbird', range(len('NTU Dumbird'))):
+    for c, i in zip('GAME OVER', range(len('GAME OVER'))):
         charObj = fontObj.render(c, True, colorify(i))
         Flappy.append(charObj)
         Flappy_rec.append(Flappy[i].get_rect())
@@ -419,7 +419,7 @@ def gameoverScr(disp):
                 sys.exit()
             elif event.type == KEYUP and event.key == K_RETURN:
                 return True
-        for i in range(len('NTU Dumbird')):
+        for i in range(len('GAME OVER')):
             disp.blit(Flappy[i], Flappy_rec[i].center)
         if mode == 0:
             disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
@@ -558,7 +558,7 @@ def main():
     
     rea.close()
     wri.close()
-    welcomeScr(display_surface)
+    gameoverScr(display_surface)
     #pygame.quit()
 
 
