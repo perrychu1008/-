@@ -454,8 +454,8 @@ def main():
         #pipe_collision = any(p.collides_with(bird) for p in pipes)
         for p in pipes:
             if p.collides_with(bird) or 0 >= bird.y or bird.y >= WIN_HEIGHT - Bird.HEIGHT:
-                print(p.atr)
-                print(bird.y)
+                #print(p.atr)
+                #print(bird.y)
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
                 if col_atr == "bonus":
                     score += 1
