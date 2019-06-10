@@ -380,6 +380,68 @@ def welcomeScr(disp):
         tictoc.tick(SLOWMOTION)
         pygame.display.update()
 
+def gameoverScr(disp):
+    WHITE = pygame.Color(255, 255, 255)
+    SLOWMOTION = 7
+    tictoc = pygame.time.Clock()
+    NAVYBLUE = pygame.Color(113, 197, 207)
+    SIZE_ALPHA = 64
+    MAGIC_NUMBER = 40
+    f = open('score.txt')
+    last_score = int(f.readline())
+    highscore = f.readline()
+    highscore = int(highscore[11:])
+
+    imgObj = pygame.image.load('images/bird_origin2.png')
+    fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
+    font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
+    font3Obj = pygame.font.Font('freesansbold.ttf', 32)
+    enter = font2Obj.render('Press Enter to play!!!', True, WHITE)
+    score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, WHITE)
+    mode = 0
+    Flappy = []
+    Flappy_rec = []
+    ALPHA_Y = WIN_HEIGHT / 2
+    ALPHA_X_INI = WIN_WIDTH / 2 - (len('NTU Dumbird') / 2)* MAGIC_NUMBER
+    birdx, birdy = WIN_WIDTH / 3, WIN_HEIGHT / 8
+    CHECK = 0
+    BLINKER = 0
+    for c, i in zip('NTU Dumbird', range(len('NTU Dumbird'))):
+        charObj = fontObj.render(c, True, colorify(i))
+        Flappy.append(charObj)
+        Flappy_rec.append(Flappy[i].get_rect())
+        Flappy_rec[i].center = (ALPHA_X_INI + i * MAGIC_NUMBER , ALPHA_Y - 100)
+    while True:
+        disp.fill(NAVYBLUE)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYUP and event.key == K_RETURN:
+                return True
+        for i in range(len('NTU Dumbird')):
+            disp.blit(Flappy[i], Flappy_rec[i].center)
+        if mode == 0:
+            disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
+            CHECK += 3
+            if CHECK >= 20:
+                mode = 1
+        elif mode == 1:
+            disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
+            CHECK -= 3
+            if CHECK <= -20:
+                mode = 0
+
+
+        if BLINKER == 0:
+            BLINKER = 1
+        else:
+            disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 30 ))
+            BLINKER = 0
+        disp.blit(score, (50, 400))
+        tictoc.tick(SLOWMOTION)
+        pygame.display.update()
+		
 def colorify(i):
     RED = pygame.Color(255, 0, 0)
     GREEN = pygame.Color(0, 255, 0)
@@ -477,12 +539,6 @@ def main():
         bird.update()
         display_surface.blit(bird.image, bird.rect)
 
-        # update and display score
-        for p in pipes:
-            if p.x + PipePair.WIDTH < bird.x and not p.score_counted:
-                score += 1
-                p.score_counted = True
-
         score_surface = score_font.render(str(score), True, (255, 255, 255))
         score_x = WIN_WIDTH/2 - score_surface.get_width()/2
         display_surface.blit(score_surface, (score_x, PipePair.PIECE_HEIGHT))
@@ -491,7 +547,7 @@ def main():
         frame_clock += 1
     print('Game over! Score: %i' % score)
     rea = open('score.txt')
-    higscore = rea.readline()
+    scorelasttime = rea.readline()
     highscore = rea.readline()
     highscore = int(highscore[11:])
     wri = open('score.txt', 'w')
@@ -499,9 +555,11 @@ def main():
         wri.write("%d\nHighscore: %d" %(score, score))
     else:
         wri.write("%d\nHighscore: %d" %(score, highscore))
+    
     rea.close()
     wri.close()
-    pygame.quit()
+    welcomeScr(display_surface)
+    #pygame.quit()
 
 
 if __name__ == '__main__':
