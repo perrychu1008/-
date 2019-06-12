@@ -1,2 +1,2 @@
-12
-Highscore: 77
+84
+Highscore: 229

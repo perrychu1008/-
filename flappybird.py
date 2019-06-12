@@ -17,6 +17,7 @@ WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
 
+
 class Bird(pygame.sprite.Sprite):
     """Represents the bird controlled by the player.
 
@@ -452,6 +453,11 @@ def colorify(i):
     lis = [RED, GREEN, PURPLE, YELLOW, ORANGE, PINK, RED, GREEN, PURPLE, YELLOW, ORANGE, PINK]
     return lis[i]
 
+def redrawWindow(backgroundPic, firstPicPos , secondPicPos , win): #用來架設背景，blit設定背景位置
+	win.blit(backgroundPic , (firstPicPos, 0))
+	win.blit(backgroundPic , (secondPicPos, 0))
+	
+	
 def main():
     """The application's entry point.
 
@@ -484,10 +490,22 @@ def main():
     frame_clock = 0  # this counter is only incremented if the game isn't paused
     score = 0
     position = 1
+	
+    bg = images['background'] #儲存background圖片，背景用同一張圖片重複出現
+    bgX = 0					  #第一張圖片的位置為零
+    bgX2 = bg.get_width()     #第二張圖片的位置為前一張的寬度之後
+	
     done = paused = False
-    welcomeScr(display_surface)
+    welcomeScr(display_surface) #開始介面
     while not done:
+        redrawWindow(bg, bgX, bgX2 , display_surface) #架設背景
         clock.tick(FPS)
+        bgX -= 3									  #第一張背景的位置會0 - 1.4，一直減下去，背景就會一直往左走
+        bgX2 -= 3									  #同上
+        if bgX < bg.get_width() * -1:				  #如果第一張背景的位置跑到負的背景圖寬度，代表背景完全跑到視窗左側，把第一張背景位置重新設為右側(圖片寬度位置)
+            bgX = bg.get_width()
+        if bgX2 < bg.get_width() * -1:				  #同上
+            bgX2 = bg.get_width()
 
         # Handle this 'manually'.  If we used pygame.time.set_timer(),
         # pipe addition would be messed up when paused.
@@ -524,10 +542,6 @@ def main():
                     p.score_counted = True
                 else:
                     done = True
-
-
-        for x in (0, WIN_WIDTH):
-            display_surface.blit(images['background'], (x, 0))
 
         while pipes and not pipes[0].visible:
             pipes.popleft()
