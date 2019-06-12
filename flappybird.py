@@ -543,10 +543,13 @@ def main():
                     p.score_counted = True
                 else:
                     done = True
-					
+            if p.x + PipePair.WIDTH < bird.x and not p.score_counted:
+                score += 1
+                p.score_counted = True		
         if score % 10 == 1 :    #每得到10分，會加速一點
             global ANIMATION_SPEED 
             ANIMATION_SPEED += 0.001 #每10分，障礙物速度加0.001
+            print(ANIMATION_SPEED)
             bgSpeed += 0.05			 #每10分，背景速度增加1
 
         while pipes and not pipes[0].visible:
