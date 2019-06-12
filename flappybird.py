@@ -12,7 +12,7 @@ from pygame.locals import *
 
 
 FPS = 60
-ANIMATION_SPEED = 0.5  # pixels per millisecond
+ANIMATION_SPEED = 0.8  # pixels per millisecond
 WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
@@ -163,7 +163,7 @@ class PipePair(pygame.sprite.Sprite):
 
     WIDTH = 100
     PIECE_HEIGHT = 32
-    ADD_INTERVAL = 1000
+    ADD_INTERVAL = 500
 
     def __init__(self, pipe_end_img, pipe_body_img):
         """
@@ -371,7 +371,6 @@ def welcomeScr(disp):
             if CHECK <= -20:
                 mode = 0
 
-
         if BLINKER == 0:
             BLINKER = 1
         else:
@@ -418,7 +417,7 @@ def gameoverScr(disp):
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYUP and event.key == K_RETURN:
+            elif event.type == KEYDOWN and event.key == K_RETURN:
                 return True
         for i in range(len('GAME OVER')):
             disp.blit(Flappy[i], Flappy_rec[i].center)
@@ -490,7 +489,8 @@ def main():
     frame_clock = 0  # this counter is only incremented if the game isn't paused
     score = 0
     position = 1
-	
+    speedPlus = 1
+    bgSpeed = 3
     bg = images['background'] #儲存background圖片，背景用同一張圖片重複出現
     bgX = 0					  #第一張圖片的位置為零
     bgX2 = bg.get_width()     #第二張圖片的位置為前一張的寬度之後
@@ -500,8 +500,9 @@ def main():
     while not done:
         redrawWindow(bg, bgX, bgX2 , display_surface) #架設背景
         clock.tick(FPS)
-        bgX -= 3									  #第一張背景的位置會0 - 1.4，一直減下去，背景就會一直往左走
-        bgX2 -= 3									  #同上
+
+        bgX -= bgSpeed								  #第一張背景的位置會0 - 1.4，一直減下去，背景就會一直往左走
+        bgX2 -= bgSpeed								  #同上
         if bgX < bg.get_width() * -1:				  #如果第一張背景的位置跑到負的背景圖寬度，代表背景完全跑到視窗左側，把第一張背景位置重新設為右側(圖片寬度位置)
             bgX = bg.get_width()
         if bgX2 < bg.get_width() * -1:				  #同上
@@ -533,7 +534,7 @@ def main():
         # check for collisions
         #pipe_collision = any(p.collides_with(bird) for p in pipes)
         for p in pipes:
-            if p.collides_with(bird) or 0 >= bird.y or bird.y >= WIN_HEIGHT - Bird.HEIGHT:
+            if p.collides_with(bird) :
                 #print(p.atr)
                 #print(bird.y)
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
@@ -542,6 +543,11 @@ def main():
                     p.score_counted = True
                 else:
                     done = True
+					
+        if score % 10 == 1 :    #每得到10分，會加速一點
+            global ANIMATION_SPEED 
+            ANIMATION_SPEED += 0.001 #每10分，障礙物速度加0.001
+            bgSpeed += 0.05			 #每10分，背景速度增加1
 
         while pipes and not pipes[0].visible:
             pipes.popleft()
@@ -573,6 +579,8 @@ def main():
     rea.close()
     wri.close()
     gameoverScr(display_surface)
+    if gameoverScr(display_surface) == True:
+        main()
     #pygame.quit()
 
 
