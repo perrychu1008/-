@@ -163,6 +163,7 @@ class PipePair(pygame.sprite.Sprite):
 
     WIDTH = 100
     PIECE_HEIGHT = 32
+    global ADD_INTERVAL
     ADD_INTERVAL = 500
 
     def __init__(self, pipe_end_img, pipe_body_img):
@@ -396,7 +397,8 @@ def gameoverScr(disp):
     fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
     font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
     font3Obj = pygame.font.Font('freesansbold.ttf', 32)
-    enter = font2Obj.render('Press Enter to play!!!', True, WHITE)
+    enter = font2Obj.render('Press Enter to Continue!!!', True, WHITE)
+    enter2 = font2Obj.render('Press Esc to Quit!!!', True, WHITE)
     score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, WHITE)
     mode = 0
     Flappy = []
@@ -417,6 +419,9 @@ def gameoverScr(disp):
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                pygame.quit()
+                sys.exit()
             elif event.type == KEYDOWN and event.key == K_RETURN:
                 return True
         for i in range(len('GAME OVER')):
@@ -432,12 +437,9 @@ def gameoverScr(disp):
             if CHECK <= -20:
                 mode = 0
 
-
-        if BLINKER == 0:
-            BLINKER = 1
-        else:
-            disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 30 ))
-            BLINKER = 0
+        disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 30 ))
+        disp.blit(enter2, (WIN_WIDTH / 2, WIN_HEIGHT / 2  ))
+        
         disp.blit(score, (50, 400))
         tictoc.tick(SLOWMOTION)
         pygame.display.update()
@@ -510,7 +512,7 @@ def main():
 
         # Handle this 'manually'.  If we used pygame.time.set_timer(),
         # pipe addition would be messed up when paused.
-        if not (paused or frame_clock % msec_to_frames(PipePair.ADD_INTERVAL)):
+        if not (paused or frame_clock % msec_to_frames(ADD_INTERVAL)):
             pp = PipePair(images['pipe-end'], images['pipe-body'])
             pipes.append(pp)
 
@@ -541,6 +543,7 @@ def main():
                 if col_atr == "bonus":
                     score += 1
                     p.score_counted = True
+					
                 else:
                     done = True
             if p.x + PipePair.WIDTH < bird.x and not p.score_counted:
@@ -584,7 +587,6 @@ def main():
     gameoverScr(display_surface)
     if gameoverScr(display_surface) == True:
         main()
-    #pygame.quit()
 
 
 if __name__ == '__main__':
