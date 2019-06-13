@@ -548,7 +548,7 @@ def main(welcome = 0):
         bird.update()
         display_surface.blit(bird.image, bird.rect)
 
-        score_surface = score_font.render(str(score), True, (100, 150, 255))
+        score_surface = score_font.render(str(score), True, (0, 0, 0))
         score_x = WIN_WIDTH/2 - score_surface.get_width()/2
         display_surface.blit(score_surface, (score_x, PipePair.PIECE_HEIGHT))
 
