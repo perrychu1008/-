@@ -293,7 +293,10 @@ def load_images():
         img.convert()
         return img
 
-    return {'background': load_image('ntu_background.png'),
+    return {'startscr': load_image('ntudb_cover.png'),
+            'ggscr': load_image('GAMEOVER.png'),
+            'background1': load_image('ntu_background_1.png'),
+            'background2': load_image('ntu_background_2.png'),
             'pipe-end': load_image('pipe_end.png'),
             'pipe-body': load_image('pipe_body.png'),
             # images for animating the flapping bird -- animated GIFs are
@@ -320,11 +323,10 @@ def msec_to_frames(milliseconds, fps=FPS):
     """
     return fps * milliseconds / 1000.0
 
-def welcomeScr(disp):
-    WHITE = pygame.Color(255, 255, 255)
+def welcomeScr(disp, pic):
+    NAVYBLUE = pygame.Color(100, 150, 255)
     SLOWMOTION = 7
     tictoc = pygame.time.Clock()
-    NAVYBLUE = pygame.Color(113, 197, 207)
     SIZE_ALPHA = 64
     MAGIC_NUMBER = 40
     f = open('score.txt')
@@ -336,31 +338,24 @@ def welcomeScr(disp):
     fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
     font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
     font3Obj = pygame.font.Font('freesansbold.ttf', 32)
-    enter = font2Obj.render('Press Enter to play!!!', True, WHITE)
-    score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, WHITE)
+    enter = font2Obj.render('Press Enter to play!!!', True, NAVYBLUE)
+    score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, NAVYBLUE)
     mode = 0
     Flappy = []
     Flappy_rec = []
-    ALPHA_Y = WIN_HEIGHT / 2
-    ALPHA_X_INI = WIN_WIDTH / 2 - (len('NTU Dumbird') / 2)* MAGIC_NUMBER
-    birdx, birdy = WIN_WIDTH / 3, WIN_HEIGHT / 8
+ 
+    birdx, birdy = WIN_WIDTH / 2, WIN_HEIGHT / 8
     CHECK = 0
     BLINKER = 0
-    for c, i in zip('NTU Dumbird', range(len('NTU Dumbird'))):
-        charObj = fontObj.render(c, True, colorify(i))
-        Flappy.append(charObj)
-        Flappy_rec.append(Flappy[i].get_rect())
-        Flappy_rec[i].center = (ALPHA_X_INI + i * MAGIC_NUMBER , ALPHA_Y - 100)
     while True:
-        disp.fill(NAVYBLUE)
+        disp.blit(pic, (0,0))
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP and event.key == K_RETURN:
                 return True
-        for i in range(len('NTU Dumbird')):
-            disp.blit(Flappy[i], Flappy_rec[i].center)
+
         if mode == 0:
             disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
             CHECK += 3
@@ -375,17 +370,16 @@ def welcomeScr(disp):
         if BLINKER == 0:
             BLINKER = 1
         else:
-            disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 30 ))
+            disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 200  ))
             BLINKER = 0
         disp.blit(score, (50, 400))
         tictoc.tick(SLOWMOTION)
         pygame.display.update()
 
-def gameoverScr(disp):
-    WHITE = pygame.Color(255, 255, 255)
+def gameoverScr(disp, pic):
+    NAVYBLUE = pygame.Color(100, 150, 255)
     SLOWMOTION = 7
     tictoc = pygame.time.Clock()
-    NAVYBLUE = pygame.Color(113, 197, 207)
     SIZE_ALPHA = 64
     MAGIC_NUMBER = 40
     f = open('score.txt')
@@ -397,24 +391,19 @@ def gameoverScr(disp):
     fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
     font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
     font3Obj = pygame.font.Font('freesansbold.ttf', 32)
-    enter = font2Obj.render('Press Enter to Continue!!!', True, WHITE)
-    enter2 = font2Obj.render('Press Esc to Quit!!!', True, WHITE)
-    score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, WHITE)
+    enter = font2Obj.render('Press Enter to Continue!!!', True, NAVYBLUE)
+    enter2 = font2Obj.render('Press Esc to Quit!!!', True, NAVYBLUE)
+    score = font3Obj.render('Highscore: %d     Lastscore: %d' %(highscore, last_score), True, NAVYBLUE)
     mode = 0
     Flappy = []
     Flappy_rec = []
-    ALPHA_Y = WIN_HEIGHT / 2
-    ALPHA_X_INI = WIN_WIDTH / 2 - (len('GAME OVER') / 2)* MAGIC_NUMBER
+
     birdx, birdy = WIN_WIDTH / 3, WIN_HEIGHT / 8
     CHECK = 0
     BLINKER = 0
-    for c, i in zip('GAME OVER', range(len('GAME OVER'))):
-        charObj = fontObj.render(c, True, colorify(i))
-        Flappy.append(charObj)
-        Flappy_rec.append(Flappy[i].get_rect())
-        Flappy_rec[i].center = (ALPHA_X_INI + i * MAGIC_NUMBER , ALPHA_Y - 100)
+
     while True:
-        disp.fill(NAVYBLUE)
+        disp.blit(pic, (0,0))
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -424,8 +413,7 @@ def gameoverScr(disp):
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_RETURN:
                 return True
-        for i in range(len('GAME OVER')):
-            disp.blit(Flappy[i], Flappy_rec[i].center)
+
         if mode == 0:
             disp.blit(imgObj, (birdx + CHECK, birdy + CHECK))
             CHECK += 3
@@ -437,29 +425,19 @@ def gameoverScr(disp):
             if CHECK <= -20:
                 mode = 0
 
-        disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 30 ))
-        disp.blit(enter2, (WIN_WIDTH / 2, WIN_HEIGHT / 2  ))
+        disp.blit(enter, (WIN_WIDTH / 2, WIN_HEIGHT / 2 + 200 ))
+        disp.blit(enter2, (50, WIN_HEIGHT / 2 + 200 ))
         
         disp.blit(score, (50, 400))
         tictoc.tick(SLOWMOTION)
         pygame.display.update()
-		
-def colorify(i):
-    RED = pygame.Color(255, 0, 0)
-    GREEN = pygame.Color(0, 255, 0)
-    PURPLE = pygame.Color(158, 9, 182)
-    YELLOW = pygame.Color(255, 255, 0)
-    ORANGE = pygame.Color(255, 128, 0)
-    PINK = pygame.Color(255, 0, 255)
-    lis = [RED, GREEN, PURPLE, YELLOW, ORANGE, PINK, RED, GREEN, PURPLE, YELLOW, ORANGE, PINK]
-    return lis[i]
 
-def redrawWindow(backgroundPic, firstPicPos , secondPicPos , win): #用來架設背景，blit設定背景位置
-	win.blit(backgroundPic , (firstPicPos, 0))
-	win.blit(backgroundPic , (secondPicPos, 0))
+def redrawWindow(backgroundPic1, backgroundPic2, firstPicPos , secondPicPos , win): #用來架設背景，blit設定背景位置
+	win.blit(backgroundPic1 , (firstPicPos, 0))
+	win.blit(backgroundPic2 , (secondPicPos, 0))
 	
 	
-def main():
+def main(welcome = 0):
     """The application's entry point.
 
     If someone executes this module (instead of importing it, for
@@ -493,22 +471,25 @@ def main():
     position = 1
     speedPlus = 1
     bgSpeed = 3
-    bg = images['background'] #儲存background圖片，背景用同一張圖片重複出現
-    bgX = 0					  #第一張圖片的位置為零
-    bgX2 = bg.get_width()     #第二張圖片的位置為前一張的寬度之後
+    bg1 = images['background1'] #儲存background圖片，背景用同一張圖片重複出現
+    bg2 = images['background2'] #儲存background圖片，背景用同一張圖片重複出現
+    bgX = 0					    #第一張圖片的位置為零
+    bgX2 = bg1.get_width()      #第二張圖片的位置為前一張的寬度之後
 	
     done = paused = False
-    welcomeScr(display_surface) #開始介面
+    if welcome == 0:
+        start_screen = images['startscr'] #儲存background圖片，背景用同一張圖片重複出現
+        welcomeScr(display_surface, start_screen) #開始介面
     while not done:
-        redrawWindow(bg, bgX, bgX2 , display_surface) #架設背景
+        redrawWindow(bg1, bg2, bgX, bgX2 , display_surface) #架設背景
         clock.tick(FPS)
 
         bgX -= bgSpeed								  #第一張背景的位置會0 - 1.4，一直減下去，背景就會一直往左走
         bgX2 -= bgSpeed								  #同上
-        if bgX < bg.get_width() * -1:				  #如果第一張背景的位置跑到負的背景圖寬度，代表背景完全跑到視窗左側，把第一張背景位置重新設為右側(圖片寬度位置)
-            bgX = bg.get_width()
-        if bgX2 < bg.get_width() * -1:				  #同上
-            bgX2 = bg.get_width()
+        if bgX < bg1.get_width() * -1:				  #如果第一張背景的位置跑到負的背景圖寬度，代表背景完全跑到視窗左側，把第一張背景位置重新設為右側(圖片寬度位置)
+            bgX = bg1.get_width()
+        if bgX2 < bg2.get_width() * -1:				  #同上
+            bgX2 = bg2.get_width()
 
         # Handle this 'manually'.  If we used pygame.time.set_timer(),
         # pipe addition would be messed up when paused.
@@ -544,7 +525,7 @@ def main():
                     score += 1
                     p.score_counted = True
                     p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0] = 'None' #將原本紀錄成bonus改成none，讓鬆餅碰一下只加一分
-                elif col_atr == "None":	#所以遇到替代bonus的None，不會做任何事
+                elif col_atr == "None":													  #所以遇到替代bonus的None，不會做任何事
                     pass
                 else:
                     done = True
@@ -586,9 +567,9 @@ def main():
     
     rea.close()
     wri.close()
-    gameoverScr(display_surface)
-    if gameoverScr(display_surface) == True:
-        main()
+    gameover_screen = images['ggscr'] #儲存background圖片，背景用同一張圖片重複出現
+    if gameoverScr(display_surface, gameover_screen) == True:
+        main(1)
 
 
 if __name__ == '__main__':
