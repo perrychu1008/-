@@ -522,7 +522,7 @@ def main(welcome = 0):
                 #print(bird.y)
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
                 if col_atr == "bonus":
-                    score += 10
+                    score += 3
                     p.score_counted = True
                     p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0] = 'None' #將原本紀錄成bonus改成none，讓鬆餅碰一下只加一分
                 elif col_atr == "None":													  #所以遇到替代bonus的None，不會做任何事
@@ -548,7 +548,7 @@ def main(welcome = 0):
         bird.update()
         display_surface.blit(bird.image, bird.rect)
 
-        score_surface = score_font.render(str(score), True, (255, 255, 255))
+        score_surface = score_font.render(str(score), True, (100, 150, 255))
         score_x = WIN_WIDTH/2 - score_surface.get_width()/2
         display_surface.blit(score_surface, (score_x, PipePair.PIECE_HEIGHT))
 
@@ -569,6 +569,7 @@ def main(welcome = 0):
     wri.close()
     gameover_screen = images['ggscr'] #儲存background圖片，背景用同一張圖片重複出現
     if gameoverScr(display_surface, gameover_screen) == True:
+        ANIMATION_SPEED = 0.6
         main(1)
 
 
