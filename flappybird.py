@@ -543,7 +543,9 @@ def main():
                 if col_atr == "bonus":
                     score += 1
                     p.score_counted = True
-					
+                    p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0] = 'None' #將原本紀錄成bonus改成none，讓鬆餅碰一下只加一分
+                elif col_atr == "None":	#所以遇到替代bonus的None，不會做任何事
+                    pass
                 else:
                     done = True
             if p.x + PipePair.WIDTH < bird.x and not p.score_counted:
