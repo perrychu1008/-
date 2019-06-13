@@ -12,7 +12,7 @@ from pygame.locals import *
 
 
 FPS = 60
-ANIMATION_SPEED = 0.8  # pixels per millisecond
+ANIMATION_SPEED = 0.6  # pixels per millisecond
 WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
@@ -443,7 +443,7 @@ def main(welcome = 0):
     If someone executes this module (instead of importing it, for
     example), this function is called.
     """
-
+    global FPS
     pygame.init()
     try:
         open('score.txt')
@@ -522,7 +522,7 @@ def main(welcome = 0):
                 #print(bird.y)
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
                 if col_atr == "bonus":
-                    score += 1
+                    score += 10
                     p.score_counted = True
                     p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0] = 'None' #將原本紀錄成bonus改成none，讓鬆餅碰一下只加一分
                 elif col_atr == "None":													  #所以遇到替代bonus的None，不會做任何事
@@ -533,9 +533,9 @@ def main(welcome = 0):
                 score += 1
                 p.score_counted = True		
         if score % 10 == 1 :    #每得到10分，會加速一點
-            global ANIMATION_SPEED 
+            global ANIMATION_SPEED
             ANIMATION_SPEED += 0.001 #每10分，障礙物速度加0.001
-            print(ANIMATION_SPEED)
+            FPS += 10
             bgSpeed += 0.05			 #每10分，背景速度增加1
 
         while pipes and not pipes[0].visible:
