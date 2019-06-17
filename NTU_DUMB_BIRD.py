@@ -212,7 +212,7 @@ def gameoverScr(disp, pic):
     highscore = f.readline()
     highscore = int(highscore[11:])
 
-    imgObj = pygame.image.load('images/wing_down.png')
+    imgObj = pygame.image.load('images/wing_down1.png')
     fontObj = pygame.font.Font('fonts/VIDEOPHREAK.ttf', SIZE_ALPHA)
     font2Obj = pygame.font.Font('fonts/gooddp.ttf', 32)
     font3Obj = pygame.font.Font('freesansbold.ttf', 32)
