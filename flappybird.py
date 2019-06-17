@@ -15,82 +15,43 @@ ANIMATION_SPEED = 0.6  # pixels per millisecond
 WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
+
 class Bird(pygame.sprite.Sprite):
 
     WIDTH = HEIGHT = 32 #The width and height of the bird's image.
-    MOVE_SPEED = 0.8
-    MOVE_DURATION = 100
+    MOVE_SPEED = 0.8 #With which speed, in pixels per millisecond
+    MOVE_DURATION = 100 #The number of milliseconds it takes the bird to execute a complete Move.
 
-    def __init__(self, x, y, msec_to_Move, images):
-        """Initialise a new Bird instance.
+    def __init__(self, x, y, msec_to_move, images):
 
-        Arguments:
-        x: The bird's initial X coordinate.
-        y: The bird's initial Y coordinate.
-        msec_to_Move: The number of milliseconds left to Move, where a
-            complete Move lasts Bird.MOVE_DURATION milliseconds.  Use
-            this if you want the bird to make a (small?) Move at the
-            very beginning of the game.
-        images: A tuple containing the images used by this bird.  It
-            must contain the following images, in the following order:
-                0. image of the bird with its wing pointing upward
-                1. image of the bird with its wing pointing downward
-        """
         super(Bird, self).__init__()
         self.x, self.y = x, y
-        self.msec_to_Move = msec_to_Move
+        self.msec_to_move = msec_to_move
         self.msec_to_sink = 0
         self._img_wingup, self._img_wingdown = images
         self._mask_wingup = pygame.mask.from_surface(self._img_wingup)
         self._mask_wingdown = pygame.mask.from_surface(self._img_wingdown)
 
     def update(self, delta_frames=1):
-        """Update the bird's position.
 
-        This function uses the cosine function to achieve a smooth Move:
-        In the first and last few frames, the bird Moves very little, in the
-        middle of the Move, it Moves a lot.
-        One complete Move lasts MOVE_DURATION milliseconds, during which
-        the bird ascends with an average speed of MOVE_SPEED px/ms.
-        This Bird's msec_to_Move attribute will automatically be
-        decreased accordingly if it was > 0 when this method was called.
-
-        Arguments:
-        delta_frames: The number of frames elapsed since this method was
-            last called.
-        """
-        if self.msec_to_Move > 0:
+        if self.msec_to_move > 0:
             self.y -= Bird.MOVE_SPEED * frames_to_msec(delta_frames)
-            self.msec_to_Move -= frames_to_msec(delta_frames)
+            self.msec_to_move -= frames_to_msec(delta_frames)
 			
         if self.msec_to_sink > 0:
             self.y += Bird.MOVE_SPEED * frames_to_msec(delta_frames) 
             self.msec_to_sink -= frames_to_msec(delta_frames)
-        #else:
-        #   self.y += Bird.SINK_SPEED * frames_to_msec(delta_frames)
 
     @property
     def image(self):
-        """Get a Surface containing this bird's image.
 
-        This will decide whether to return an image where the bird's
-        visible wing is pointing upward or where it is pointing downward
-        based on pygame.time.get_ticks().  This will animate the flapping
-        bird, even though pygame doesn't support animated GIFs.
-        """
         if pygame.time.get_ticks() % 500 >= 250:
             return self._img_wingup
         else:
             return self._img_wingdown
 
-
-
     @property
     def mask(self):
-        """Get a bitmask for use in collision detection.
-
-        The bitmask excludes all pixels in self.image with a
-        transparency greater than 127."""
         if pygame.time.get_ticks() % 500 >= 250:
             return self._mask_wingup
         else:
@@ -98,7 +59,6 @@ class Bird(pygame.sprite.Sprite):
 
     @property
     def rect(self):
-        """Get the bird's position, width, and height, as a pygame.Rect."""
         return Rect(self.x, self.y, Bird.WIDTH, Bird.HEIGHT)
 
 
@@ -232,33 +192,9 @@ class PipePair(pygame.sprite.Sprite):
 
 
 def load_images():
-    """Load all images required by the game and return a dict of them.
-
-    The returned dict has the following keys:
-    background: The game's background image.
-    bird-wingup: An image of the bird with its wing pointing upward.
-        Use this and bird-wingdown to create a flapping bird.
-    bird-wingdown: An image of the bird with its wing pointing downward.
-        Use this and bird-wingup to create a flapping bird.
-    pipe-end: An image of a pipe's end piece (the slightly wider bit).
-        Use this and pipe-body to make pipes.
-    pipe-body: An image of a slice of a pipe's body.  Use this and
-        pipe-body to make pipes.
-    """
 
     def load_image(img_file_name):
-        """Return the loaded pygame image with the specified file name.
-
-        This function looks for images in the game's images folder
-        (./images/).  All images are converted before being returned to
-        speed up blitting.
-
-        Arguments:
-        img_file_name: The file name (including its extension, e.g.
-            '.png') of the required image, without a file path.
-        """
         file_name = os.path.join('.', 'images', img_file_name)
-        #file_name = "/Users/ryanhuang/Desktop/107-2/FIN programming/PBC-final-project/images/" + img_file_name
         img = pygame.image.load(file_name)
         img.convert()
         return img
@@ -269,28 +205,13 @@ def load_images():
             'background2': load_image('ntu_background_2.png'),
             'pipe-end': load_image('pipe_end.png'),
             'pipe-body': load_image('pipe_body.png'),
-            # images for animating the flapping bird -- animated GIFs are
-            # not supported in pygame
             'bird_origin': load_image('bird_origin1.png'),
             'bird-run': load_image('bird-run1.png')}
 
 def frames_to_msec(frames, fps=FPS):
-    """Convert frames to milliseconds at the specified framerate.
-
-    Arguments:
-    frames: How many frames to convert to milliseconds.
-    fps: The framerate to use for conversion.  Default: FPS.
-    """
     return 1000.0 * frames / fps
 
-
 def msec_to_frames(milliseconds, fps=FPS):
-    """Convert milliseconds to frames at the specified framerate.
-
-    Arguments:
-    milliseconds: How many milliseconds to convert to frames.
-    fps: The framerate to use for conversion.  Default: FPS.
-    """
     return fps * milliseconds / 1000.0
 
 def welcomeScr(disp, pic):
@@ -429,8 +350,6 @@ def main(welcome = 0):
     score_font = pygame.font.SysFont(None, 32, bold=True)  # default font
     images = load_images()
 
-    # the bird stays in the same x position, so bird.x is a constant
-    # center bird on screen
     bird = Bird(30, int(WIN_HEIGHT* 3/4)-30, 2,
                 (images['bird_origin'], images['bird-run']))
 
@@ -475,7 +394,7 @@ def main(welcome = 0):
                 paused = not paused
             elif e.type == KEYDOWN and e.key == K_UP:
                 if position != 2:	
-                    bird.msec_to_Move = Bird.MOVE_DURATION
+                    bird.msec_to_move = Bird.MOVE_DURATION
                     position +=1
             elif e.type == KEYDOWN and e.key == K_DOWN:
                 if position != 0:
@@ -484,12 +403,8 @@ def main(welcome = 0):
         if paused:
             continue  # don't draw anything
 
-        # check for collisions
-        #pipe_collision = any(p.collides_with(bird) for p in pipes)
         for p in pipes:
             if p.collides_with(bird) :
-                #print(p.atr)
-                #print(bird.y)
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
                 if col_atr == "bonus":
                     score += 3
@@ -544,6 +459,4 @@ def main(welcome = 0):
 
 
 if __name__ == '__main__':
-    # If this module had been imported, __name__ would be 'flappybird'.
-    # It was executed (e.g. by double-clicking the file), so call main.
     main()
