@@ -62,34 +62,7 @@ class Bird(pygame.sprite.Sprite):
         return Rect(self.x, self.y, Bird.WIDTH, Bird.HEIGHT)
 
 
-class PipePair(pygame.sprite.Sprite):
-    """Represents an obstacle.
-
-    A PipePair has a top and a bottom pipe, and only between them can
-    the bird pass -- if it collides with either part, the game is over.
-
-    Attributes:
-    x: The PipePair's X position.  This is a float, to make Movement
-        smoother.  Note that there is no y attribute, as it will only
-        ever be 0.
-    image: A pygame.Surface which can be blitted to the display surface
-        to display the PipePair.
-    mask: A bitmask which excludes all pixels in self.image with a
-        transparency greater than 127.  This can be used for collision
-        detection.
-    top_pieces: The number of pieces, including the end piece, in the
-        top pipe.
-    bottom_pieces: The number of pieces, including the end piece, in
-        the bottom pipe.
-
-    Constants:
-    WIDTH: The width, in pixels, of a pipe piece.  Because a pipe is
-        only one piece wide, this is also the width of a PipePair's
-        image.
-    PIECE_HEIGHT: The height, in pixels, of a pipe piece.
-    ADD_INTERVAL: The interval, in milliseconds, in between adding new
-        pipes.
-    """
+class Obstacle_bonus(pygame.sprite.Sprite):
 
     WIDTH = 100
     PIECE_HEIGHT = 32
@@ -97,37 +70,24 @@ class PipePair(pygame.sprite.Sprite):
     ADD_INTERVAL = 500
 
     def __init__(self, pipe_end_img, pipe_body_img):
-        """
-        Initialises a new random PipePair.
-
-        The new PipePair will automatically be assigned an x attribute of
-        float(WIN_WIDTH - 1).
-
-        Arguments:
-        pipe_end_img: The image to use to represent a pipe's end piece.
-        pipe_body_img: The image to use to represent one horizontal slice
-            of a pipe's body.
-        """
-        self.x = float(WIN_WIDTH - 1)
-        # self.y = randint(0,2) * 87 + 40
+    
+        self.x = float(WIN_WIDTH - 1) # The new Obstacle_bonus will automatically be assigned an x attribute of
+        float(WIN_WIDTH - 1)
         self.score_counted = False
         self.mul_pipe = randint(1,2)
-
-        self.image = pygame.Surface((PipePair.WIDTH, WIN_HEIGHT), SRCALPHA)
-        self.image.convert()   # speeds up blitting
+        self.image = pygame.Surface((Obstacle_bonus.WIDTH, WIN_HEIGHT), SRCALPHA)
+        self.image.convert()   		  # speeds up blitting
         self.image.fill((0, 0, 0, 0))
-       
         self.bottom_pieces = 1
-        #self.top_pieces = total_pipe_body_pieces - self.bottom_pieces
 
         #  Add obstacle
         atr_lst = []
-        a = sample(range(0, 3),2)
-        y = [i * 87 + 40 for i in a]
-        for i in range(self.mul_pipe):
-            is_bonus = True if randrange(2) % 3 == 0 else False
+        a = sample(range(0, 3),2)								
+        y = [i * 87 + 40 for i in a]							#固定物件生成位置在三條路上
+        for i in range(self.mul_pipe):                          #隨機決定要生成1或2個物件
+            is_bonus = True if randrange(2) % 3 == 0 else False #隨機決定是Bonus還是Obstacle
             if i == 0:
-                piece_pos = (0, WIN_HEIGHT - PipePair.PIECE_HEIGHT - y[i])
+                piece_pos = (0, WIN_HEIGHT - Obstacle_bonus.PIECE_HEIGHT - y[i])
                 if is_bonus:
                     self.image.blit(pipe_body_img, piece_pos)
                     atr_lst = [["bonus",piece_pos[1]]]
@@ -135,7 +95,7 @@ class PipePair(pygame.sprite.Sprite):
                     self.image.blit(pipe_end_img, piece_pos)
                     atr_lst = [["obstacle",piece_pos[1]]]
             if i == 1:
-                piece_pos = (0, WIN_HEIGHT - PipePair.PIECE_HEIGHT - y[i])
+                piece_pos = (0, WIN_HEIGHT - Obstacle_bonus.PIECE_HEIGHT - y[i])
                 if is_bonus:
                     self.image.blit(pipe_body_img, piece_pos)
                     atr_lst.append(["bonus",piece_pos[1]])
@@ -144,52 +104,26 @@ class PipePair(pygame.sprite.Sprite):
                     atr_lst.append(["obstacle",piece_pos[1]])
         self.atr = atr_lst
         
-
-        # compensate for added end pieces
-        # self.top_pieces += 1
-        self.bottom_pieces += 1
-
         # for collision detection
         self.mask = pygame.mask.from_surface(self.image)
 
     @property
-    def top_height_px(self):
-        """Get the top pipe's height, in pixels."""
-        return self.top_pieces * PipePair.PIECE_HEIGHT
-
-    @property
-    def bottom_height_px(self):
-        """Get the bottom pipe's height, in pixels."""
-        return self.bottom_pieces * PipePair.PIECE_HEIGHT
-
-    @property
     def visible(self):
-        """Get whether this PipePair on screen, visible to the player."""
-        return -PipePair.WIDTH < self.x < WIN_WIDTH
+        #Get whether this Obstacle_bonus on screen, visible to the player."""
+        return -Obstacle_bonus.WIDTH < self.x < WIN_WIDTH
 
     @property
     def rect(self):
-        """Get the Rect which contains this PipePair."""
-        return Rect(self.x, 0, PipePair.WIDTH, PipePair.PIECE_HEIGHT)
+        #Get the Rect which contains this Obstacle_bonus."""
+        return Rect(self.x, 0, Obstacle_bonus.WIDTH, Obstacle_bonus.PIECE_HEIGHT)
 
     def update(self, delta_frames=1):
-        """Update the PipePair's position.
-
-        Arguments:
-        delta_frames: The number of frames elapsed since this method was
-            last called.
-        """
+        #Update the Obstacle_bonus's position.
         self.x -= ANIMATION_SPEED * frames_to_msec(delta_frames)
 
     def collides_with(self, bird):
-        """Get whether the bird collides with a pipe in this PipePair.
-
-        Arguments:
-        bird: The Bird which should be tested for collision with this
-            PipePair.
-        """
+        #Get whether the bird collides with Obstacle_bonus.
         return pygame.sprite.collide_mask(self, bird)
-
 
 def load_images():
 
@@ -353,7 +287,7 @@ def main(welcome = 0):
     bird = Bird(30, int(WIN_HEIGHT* 3/4)-30, 2,
                 (images['bird_origin'], images['bird-run']))
 
-    pipes = deque()
+    objects = deque()
 
     frame_clock = 0  # this counter is only incremented if the game isn't paused
     score = 0
@@ -383,8 +317,8 @@ def main(welcome = 0):
         # Handle this 'manually'.  If we used pygame.time.set_timer(),
         # pipe addition would be messed up when paused.
         if not (paused or frame_clock % msec_to_frames(ADD_INTERVAL)):
-            pp = PipePair(images['pipe-end'], images['pipe-body'])
-            pipes.append(pp)
+            pp = Obstacle_bonus(images['pipe-end'], images['pipe-body'])
+            objects.append(pp)
 
         for e in pygame.event.get():
             if e.type == QUIT or (e.type == KEYUP and e.key == K_ESCAPE):
@@ -403,7 +337,7 @@ def main(welcome = 0):
         if paused:
             continue  # don't draw anything
 
-        for p in pipes:
+        for p in objects:
             if p.collides_with(bird) :
                 col_atr = p.atr[np.argmin([abs(bird.y - atr[1]) for atr in p.atr])][0]
                 if col_atr == "bonus":
@@ -414,19 +348,19 @@ def main(welcome = 0):
                     pass
                 else:
                     done = True
-            if p.x + PipePair.WIDTH < bird.x and not p.score_counted:
+            if p.x + Obstacle_bonus.WIDTH < bird.x and not p.score_counted:
                 score += 1
                 p.score_counted = True		
-        if score % 10 == 1 :    #每得到10分，會加速一點
+        if score % 10 == 1 :    	 #每得到10分，會加速一點
             global ANIMATION_SPEED
             ANIMATION_SPEED += 0.001 #每10分，障礙物速度加0.001
             FPS += 10
             bgSpeed += 0.05			 #每10分，背景速度增加1
 
-        while pipes and not pipes[0].visible:
-            pipes.popleft()
+        while objects and not objects[0].visible:
+            objects.popleft()
 
-        for p in pipes:
+        for p in objects:
             p.update()
             display_surface.blit(p.image, p.rect)
 
@@ -435,7 +369,7 @@ def main(welcome = 0):
 
         score_surface = score_font.render(str(score), True, (0, 0, 0))
         score_x = WIN_WIDTH/2 - score_surface.get_width()/2
-        display_surface.blit(score_surface, (score_x, PipePair.PIECE_HEIGHT))
+        display_surface.blit(score_surface, (score_x, Obstacle_bonus.PIECE_HEIGHT))
 
         pygame.display.flip()
         frame_clock += 1
