@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 
-"""Flappy Bird, implemented using Pygame."""
+"""NTU DUMB Bird, implemented using Pygame."""
 
-import math
 import os
 from random import randint, randrange, sample
 from collections import deque
@@ -10,54 +9,27 @@ import numpy as np
 import pygame
 from pygame.locals import *
 
-
+#Setting
 FPS = 60
 ANIMATION_SPEED = 0.6  # pixels per millisecond
 WIN_WIDTH = 568    # BG image size: 284x512 px; tiled twice
 WIN_HEIGHT = 512
 
-
-
 class Bird(pygame.sprite.Sprite):
-    """Represents the bird controlled by the player.
 
-    The bird is the 'hero' of this game.  The player can make it climb
-    (ascend quickly), otherwise it sinks (descends more slowly).  It must
-    pass through the space in between pipes (for every pipe passed, one
-    point is scored); if it crashes into a pipe, the game ends.
+    WIDTH = HEIGHT = 32 #The width and height of the bird's image.
+    MOVE_SPEED = 0.8
+    MOVE_DURATION = 100
 
-    Attributes:
-    x: The bird's X coordinate.
-    y: The bird's Y coordinate.
-    msec_to_climb: The number of milliseconds left to climb, where a
-        complete climb lasts Bird.CLIMB_DURATION milliseconds.
-
-    Constants:
-    WIDTH: The width, in pixels, of the bird's image.
-    HEIGHT: The height, in pixels, of the bird's image.
-    SINK_SPEED: With which speed, in pixels per millisecond, the bird
-        descends in one second while not climbing.
-    CLIMB_SPEED: With which speed, in pixels per millisecond, the bird
-        ascends in one second while climbing, on average.  See also the
-        Bird.update docstring.
-    CLIMB_DURATION: The number of milliseconds it takes the bird to
-        execute a complete climb.
-    """
-
-    WIDTH = HEIGHT = 32
-    SINK_SPEED = 0
-    CLIMB_SPEED = 0.8
-    CLIMB_DURATION = 100
-
-    def __init__(self, x, y, msec_to_climb, images):
+    def __init__(self, x, y, msec_to_Move, images):
         """Initialise a new Bird instance.
 
         Arguments:
         x: The bird's initial X coordinate.
         y: The bird's initial Y coordinate.
-        msec_to_climb: The number of milliseconds left to climb, where a
-            complete climb lasts Bird.CLIMB_DURATION milliseconds.  Use
-            this if you want the bird to make a (small?) climb at the
+        msec_to_Move: The number of milliseconds left to Move, where a
+            complete Move lasts Bird.MOVE_DURATION milliseconds.  Use
+            this if you want the bird to make a (small?) Move at the
             very beginning of the game.
         images: A tuple containing the images used by this bird.  It
             must contain the following images, in the following order:
@@ -66,7 +38,7 @@ class Bird(pygame.sprite.Sprite):
         """
         super(Bird, self).__init__()
         self.x, self.y = x, y
-        self.msec_to_climb = msec_to_climb
+        self.msec_to_Move = msec_to_Move
         self.msec_to_sink = 0
         self._img_wingup, self._img_wingdown = images
         self._mask_wingup = pygame.mask.from_surface(self._img_wingup)
@@ -75,26 +47,24 @@ class Bird(pygame.sprite.Sprite):
     def update(self, delta_frames=1):
         """Update the bird's position.
 
-        This function uses the cosine function to achieve a smooth climb:
-        In the first and last few frames, the bird climbs very little, in the
-        middle of the climb, it climbs a lot.
-        One complete climb lasts CLIMB_DURATION milliseconds, during which
-        the bird ascends with an average speed of CLIMB_SPEED px/ms.
-        This Bird's msec_to_climb attribute will automatically be
+        This function uses the cosine function to achieve a smooth Move:
+        In the first and last few frames, the bird Moves very little, in the
+        middle of the Move, it Moves a lot.
+        One complete Move lasts MOVE_DURATION milliseconds, during which
+        the bird ascends with an average speed of MOVE_SPEED px/ms.
+        This Bird's msec_to_Move attribute will automatically be
         decreased accordingly if it was > 0 when this method was called.
 
         Arguments:
         delta_frames: The number of frames elapsed since this method was
             last called.
         """
-        if self.msec_to_climb > 0:
-#            frac_climb_done = 1
-            self.y -= Bird.CLIMB_SPEED * frames_to_msec(delta_frames)
-            self.msec_to_climb -= frames_to_msec(delta_frames)
+        if self.msec_to_Move > 0:
+            self.y -= Bird.MOVE_SPEED * frames_to_msec(delta_frames)
+            self.msec_to_Move -= frames_to_msec(delta_frames)
 			
         if self.msec_to_sink > 0:
-#            frac_climb_done = 1
-            self.y += Bird.CLIMB_SPEED * frames_to_msec(delta_frames) 
+            self.y += Bird.MOVE_SPEED * frames_to_msec(delta_frames) 
             self.msec_to_sink -= frames_to_msec(delta_frames)
         #else:
         #   self.y += Bird.SINK_SPEED * frames_to_msec(delta_frames)
@@ -139,7 +109,7 @@ class PipePair(pygame.sprite.Sprite):
     the bird pass -- if it collides with either part, the game is over.
 
     Attributes:
-    x: The PipePair's X position.  This is a float, to make movement
+    x: The PipePair's X position.  This is a float, to make Movement
         smoother.  Note that there is no y attribute, as it will only
         ever be 0.
     image: A pygame.Surface which can be blitted to the display surface
@@ -505,11 +475,11 @@ def main(welcome = 0):
                 paused = not paused
             elif e.type == KEYDOWN and e.key == K_UP:
                 if position != 2:	
-                    bird.msec_to_climb = Bird.CLIMB_DURATION
+                    bird.msec_to_Move = Bird.MOVE_DURATION
                     position +=1
             elif e.type == KEYDOWN and e.key == K_DOWN:
                 if position != 0:
-                    bird.msec_to_sink = Bird.CLIMB_DURATION
+                    bird.msec_to_sink = Bird.MOVE_DURATION
                     position -=1
         if paused:
             continue  # don't draw anything
